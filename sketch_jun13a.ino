@@ -36,7 +36,7 @@ void setup() {
 
 
 void loop() {
-  TFTscreen.background(0, 0, 0);
+//  TFTscreen.background(0, 0, 0);
   // first col
   for(int i=0;i<5;i++){
     int value = analogRead(inputs[i]);
@@ -65,6 +65,8 @@ void loop() {
 
 
   for(int i=0;i<10;i++){
+    int col = i/5;
+    
     if(vals[i]<=3.85){
       TFTscreen.stroke(10, 10, 255);
     }else if(vals[i]>3.85 && vals[i]<=4.0){
@@ -73,8 +75,11 @@ void loop() {
       TFTscreen.stroke(10, 255, 10);
     }
 
-    int col = i/5;
+    // clear rect
+    TFTscreen.fill(0,0,0);
+    TFTscreen.rect(col*80, 25*(i-5*col), 80, 25);
     TFTscreen.text(strs[i], 6+col*80, 25*(i-5*col)+5);
+    delay(50);
   }
   
   delay(500);
