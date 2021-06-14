@@ -4,13 +4,13 @@
 #include    <stdlib.h>
 
 // pin definition for Arduino UNO
-#define cs   10
-#define dc   9
+#define cs   53
+#define dc   22
 #define rst  8
 
 int analogInput = 0;
-int inputs[] = {14,15,16,17,18,14,15,16,17,18};
-int rs[] = {1,1,1,1,1,1,1,1,1,1};
+int inputs[] = {87,88,89,90,91,92,93,94,95,96};
+int rs[] = {1,2,3,4,5};
 char strs[10][20];
 
 
@@ -37,13 +37,29 @@ void setup() {
 
 void loop() {
   TFTscreen.background(0, 0, 0);
-  
-  for(int i=0;i<10;i++){
+  // first col
+  for(int i=0;i<5;i++){
     int value = analogRead(inputs[i]);
-    float vout = (value * 5.0) / 1024.0; // see text
-//    float vin = vout / rs[i];
-//    vals[i]=vin; 
+    float vout = (value * 5.0) / 1024.0 * rs[i];
+
+    for(int j=0; j<i-1; j++){
+      vout = vout - vals[j];
+    }
     vals[i]=vout;
+    
+    dtostrf(vout, 2, 2, strs[i]);
+  }
+
+  // second col
+  for(int i=5;i<10;i++){
+    int value = analogRead(inputs[i]);
+    float vout = (value * 5.0) / 1024.0 * rs[i-5];
+
+    for(int j=5; j<i-1; j++){
+      vout = vout - vals[j];
+    }
+    vals[i]=vout;
+    
     dtostrf(vout, 2, 2, strs[i]);
   }
 
@@ -61,6 +77,6 @@ void loop() {
     TFTscreen.text(strs[i], 6+col*80, 25*(i-5*col)+5);
   }
   
-  delay(100);
+  delay(500);
   
 }
