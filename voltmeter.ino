@@ -14,7 +14,7 @@
 
 int analogInput = 0;
 int inputs[] = {87,88,89,90,97,92,93,94,98,96};
-int rs[] = {1,2,3,4,5};
+int rs[] = {1,2,3,4,5,1,2,3,4,5};
 bool refresh[10];
 char strs[10][20];
 
@@ -28,7 +28,7 @@ void setup() {
   Serial.begin(9600);
   Serial.print("setup");
   Serial.println();
-//  pinMode(14, INPUT);
+
   for(int i=0;i<val_size;i++){
      pinMode(inputs[i], INPUT);
   }
@@ -46,9 +46,8 @@ void setup() {
 void loop() {
   Serial.print("loop");
   Serial.println();
-//  TFTscreen.background(0, 0, 0);
-  // first col
-  for(int i=0;i<5;i++){
+  // first and second col
+  for(int i=0;i<10;i++){
     int value = analogRead(inputs[i]);
     float vout = (value * 5.0) / 1024.0 * rs[i];
 
@@ -57,7 +56,8 @@ void loop() {
     Serial.print("On pin ");
     Serial.print(inputs[i]);
     Serial.println();
-    for(int j=0; j<i; j++){
+    int colStart = i/5*5;
+    for(int j = colStart; j<i; j++){
       Serial.print(" -");
       Serial.print(vals[j]);
       vout = vout - vals[j];
@@ -71,18 +71,7 @@ void loop() {
   Serial.print("First half: ");
   printArr(vals, 5);
   Serial.println();
-  // second col
-  for(int i=5;i<10;i++){
-    int value = analogRead(inputs[i]);
-    float vout = (value * 5.0) / 1024.0 * rs[i-5];
 
-    for(int j=5; j<i; j++){
-      vout = vout - vals[j];
-    }
-    setNewValue(i, vout);
-    
-    dtostrf(vout, 2, 2, strs[i]);
-  }
   Serial.print("Second half: ");
   printArr(vals+5, 5);
   Serial.println();
