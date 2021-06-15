@@ -8,7 +8,9 @@
 #define dc   22
 #define rst  8
 
-#define EPSILON 0.01
+#define EPSILON   0.01
+#define CL_HEIGHT 25
+#define CL_WIDTH  80
 
 int analogInput = 0;
 int inputs[] = {87,88,89,90,97,92,93,94,98,96};
@@ -99,8 +101,8 @@ void loop() {
 
     // clear rect
     TFTscreen.fill(0,0,0);
-    TFTscreen.rect(col*80, 25*(i-5*col), 80, 25);
-    TFTscreen.text(strs[i], 6+col*80, 25*(i-5*col)+5);
+    TFTscreen.rect(col*80, CL_HEIGHT*(i-5*col), CL_WIDTH, CL_HEIGHT);
+    TFTscreen.text(strs[i], 6+col*CL_WIDTH, CL_HEIGHT*(i-5*col)+5);
   }
   
   delay(500);
