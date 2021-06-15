@@ -1,7 +1,7 @@
 // include TFT and SPI libraries
 #include <TFT.h>  
 #include <SPI.h>
-#include    <stdlib.h>
+#include <stdlib.h>
 
 // pin definition for Arduino UNO
 #define cs   53
@@ -9,7 +9,7 @@
 #define rst  8
 
 int analogInput = 0;
-int inputs[] = {87,88,89,90,91,92,93,94,95,96};
+int inputs[] = {87,88,89,90,97,92,93,94,98,96};
 int rs[] = {1,2,3,4,5};
 char strs[10][20];
 
@@ -20,6 +20,9 @@ int val_size = 10;
 float vals[10];
 
 void setup() {
+  Serial.begin(9600);
+  Serial.print("setup");
+  Serial.println();
 //  pinMode(14, INPUT);
   for(int i=0;i<val_size;i++){
      pinMode(inputs[i], INPUT);
@@ -36,33 +39,48 @@ void setup() {
 
 
 void loop() {
+  Serial.print("loop");
+  Serial.println();
 //  TFTscreen.background(0, 0, 0);
   // first col
   for(int i=0;i<5;i++){
     int value = analogRead(inputs[i]);
     float vout = (value * 5.0) / 1024.0 * rs[i];
 
-    for(int j=0; j<i-1; j++){
+    Serial.print("Got value :");
+    Serial.print(vout);
+    Serial.print("On pin ");
+    Serial.print(inputs[i]);
+    Serial.println();
+    for(int j=0; j<i; j++){
+      Serial.print(" -");
+      Serial.print(vals[j]);
       vout = vout - vals[j];
     }
+    Serial.println();
     vals[i]=vout;
     
     dtostrf(vout, 2, 2, strs[i]);
   }
 
+  Serial.print("First half: ");
+  printArr(vals, 5);
+  Serial.println();
   // second col
   for(int i=5;i<10;i++){
     int value = analogRead(inputs[i]);
     float vout = (value * 5.0) / 1024.0 * rs[i-5];
 
-    for(int j=5; j<i-1; j++){
+    for(int j=5; j<i; j++){
       vout = vout - vals[j];
     }
     vals[i]=vout;
     
     dtostrf(vout, 2, 2, strs[i]);
   }
-
+  Serial.print("Second half: ");
+  printArr(vals+5, 5);
+  Serial.println();
 
   for(int i=0;i<10;i++){
     int col = i/5;
@@ -84,4 +102,14 @@ void loop() {
   
   delay(500);
   
+}
+
+void printArr(float* arr, int size){
+  Serial.print("[");
+  for (int i = 0; i < size-1; i++){
+    Serial.print(arr[i]);
+    Serial.print(", ");
+  }
+  Serial.print(arr[size-1]);
+  Serial.print("]");
 }
