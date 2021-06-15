@@ -9,14 +9,16 @@
 #define rst  8
 
 #define EPSILON   0.01
-#define CL_HEIGHT 25
+#define CL_HEIGHT 20
 #define CL_WIDTH  80
+#define COLUMNS 2
 
 int analogInput = 0;
 int inputs[] = {87,88,89,90,97,92,93,94,98,96};
 int rs[] = {1,2,3,4,5,1,2,3,4,5};
 bool refresh[10];
-char strs[10][20];
+char strs[10][10];
+char sumStrs[2][10];
 
 
 // create an instance of the library
@@ -56,6 +58,12 @@ void loop() {
     Serial.print("On pin ");
     Serial.print(inputs[i]);
     Serial.println();
+
+    // sum will be in the last cell, save into separate array
+    if(i%5 == 4){
+      dtostrf(vout, 2, 2, sumStrs[i/5]);
+    }
+
     int colStart = i/5*5;
     for(int j = colStart; j<i; j++){
       Serial.print(" -");
@@ -90,8 +98,14 @@ void loop() {
 
     // clear rect
     TFTscreen.fill(0,0,0);
-    TFTscreen.rect(col*80, CL_HEIGHT*(i-5*col), CL_WIDTH, CL_HEIGHT);
+    TFTscreen.rect(col*CL_WIDTH, CL_HEIGHT*(i-5*col), CL_WIDTH, CL_HEIGHT);
     TFTscreen.text(strs[i], 6+col*CL_WIDTH, CL_HEIGHT*(i-5*col)+5);
+  }
+  
+  for (int i = 0; i < COLUMNS; i++){
+    TFTscreen.stroke(255, 255, 255);
+    TFTscreen.rect(i*CL_WIDTH, CL_HEIGHT*5, CL_WIDTH, CL_HEIGHT);
+    TFTscreen.text(sumStrs[i], 6+i*CL_WIDTH, CL_HEIGHT*5+5);
   }
   
   delay(500);
