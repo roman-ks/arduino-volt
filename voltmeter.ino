@@ -8,24 +8,24 @@
 #define dc   22
 #define rst  8
 
-#define EPSILON   0.01
-#define CL_HEIGHT 20
-#define CL_WIDTH  80
-#define COLUMNS   2
+#define EPSILON     0.01
+#define CL_HEIGHT   20
+#define CL_WIDTH    80
+#define COLUMNS     2
+#define ROWS        5     // rows without sum row
+#define VALUE_CELLS ROWS*COLUMNS
 
-int analogInput = 0;
 int inputs[] = {87,88,89,90,97,92,93,94,98,96};
 int rs[] = {1,2,3,4,5,1,2,3,4,5};
-bool refresh[10];
+bool refresh[VALUE_CELLS];
 bool sumRefresh[COLUMNS];
-char strs[10][10];
-char sumStrs[COLUMNS][10];
+char strs[VALUE_CELLS][VALUE_CELLS];
+char sumStrs[COLUMNS][VALUE_CELLS];
 
 
 // create an instance of the library
 TFT TFTscreen = TFT(cs, dc, rst);
-int val_size = 10;
-float vals[10];
+float vals[VALUE_CELLS];
 float sumVals[COLUMNS];
 
 void setup() {
@@ -33,7 +33,7 @@ void setup() {
   Serial.print("setup");
   Serial.println();
 
-  for(int i=0;i<val_size;i++){
+  for(int i=0;i<VALUE_CELLS;i++){
      pinMode(inputs[i], INPUT);
   }
  
@@ -51,7 +51,7 @@ void loop() {
   Serial.print("loop");
   Serial.println();
   // first and second col
-  for(int i=0;i<10;i++){
+  for(int i=0;i<VALUE_CELLS;i++){
     int value = analogRead(inputs[i]);
     float vout = (value * 5.0) / 1024.0 * rs[i];
 
@@ -62,12 +62,12 @@ void loop() {
     Serial.println();
 
     // sum will be in the last cell, save into separate array
-    if(i%5 == 4){
-      int offset = i/5;
+    if(i%ROWS == ROWS-1){
+      int offset = i/ROWS;
       setNewValue(offset, vout, sumVals+offset, sumRefresh+offset, sumStrs[offset]);
     }
 
-    int colStart = i/5*5;
+    int colStart = i/ROWS*ROWS;
     for(int j = colStart; j<i; j++){
       Serial.print(" -");
       Serial.print(vals[j]);
@@ -78,16 +78,16 @@ void loop() {
   }
 
   Serial.print("First half: ");
-  printArr(vals, 5);
+  printArr(vals, ROWS);
   Serial.println();
 
   Serial.print("Second half: ");
-  printArr(vals+5, 5);
+  printArr(vals+ROWS, ROWS);
   Serial.println();
 
-  for(int i=0;i<10;i++){
+  for(int i=0;i<VALUE_CELLS;i++){
     if(!refresh[i]) continue;
-    int col = i/5;
+    int col = i/ROWS;
     
     if(vals[i]<=3.85){
       TFTscreen.stroke(10, 10, 255);
