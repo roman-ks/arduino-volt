@@ -11,20 +11,22 @@
 #define EPSILON   0.01
 #define CL_HEIGHT 20
 #define CL_WIDTH  80
-#define COLUMNS 2
+#define COLUMNS   2
 
 int analogInput = 0;
 int inputs[] = {87,88,89,90,97,92,93,94,98,96};
 int rs[] = {1,2,3,4,5,1,2,3,4,5};
 bool refresh[10];
+bool sumRefresh[COLUMNS];
 char strs[10][10];
-char sumStrs[2][10];
+char sumStrs[COLUMNS][10];
 
 
 // create an instance of the library
 TFT TFTscreen = TFT(cs, dc, rst);
 int val_size = 10;
 float vals[10];
+float sumVals[COLUMNS];
 
 void setup() {
   Serial.begin(9600);
@@ -61,7 +63,8 @@ void loop() {
 
     // sum will be in the last cell, save into separate array
     if(i%5 == 4){
-      dtostrf(vout, 2, 2, sumStrs[i/5]);
+      int offset = i/5;
+      setNewValue(offset, vout, sumVals+offset, sumRefresh+offset, sumStrs[offset]);
     }
 
     int colStart = i/5*5;
@@ -71,9 +74,7 @@ void loop() {
       vout = vout - vals[j];
     }
     Serial.println();
-    setNewValue(i, vout);
-    
-    dtostrf(vout, 2, 2, strs[i]);
+    setNewValue(i, vout, vals+i, refresh+i, strs[i]);
   }
 
   Serial.print("First half: ");
@@ -103,6 +104,7 @@ void loop() {
   }
   
   for (int i = 0; i < COLUMNS; i++){
+    if(!sumRefresh[i]) continue;
     TFTscreen.stroke(255, 255, 255);
     TFTscreen.rect(i*CL_WIDTH, CL_HEIGHT*5, CL_WIDTH, CL_HEIGHT);
     TFTscreen.text(sumStrs[i], 6+i*CL_WIDTH, CL_HEIGHT*5+5);
@@ -112,13 +114,13 @@ void loop() {
   
 }
 
-void setNewValue(int i, float val){
-  if(fabs(vals[i]-val)>=EPSILON){
-      vals[i]=val;
-      refresh[i]=true;
-    }else{
-      refresh[i]=false;
-    }
+void setNewValue(int i, float val, float* valPtr, bool* refreshPtr, char* strVal){
+  bool isNew = fabs(*valPtr-val) >= EPSILON;
+  if(isNew){
+      *valPtr=val;
+      dtostrf(val, 2, 2, strVal);
+  }
+  *refreshPtr = isNew;
 }
 
 void printArr(float* arr, int size){
