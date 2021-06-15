@@ -8,9 +8,12 @@
 #define dc   22
 #define rst  8
 
+#define EPSILON 0.01
+
 int analogInput = 0;
 int inputs[] = {87,88,89,90,97,92,93,94,98,96};
 int rs[] = {1,2,3,4,5};
+bool refresh[10];
 char strs[10][20];
 
 
@@ -58,7 +61,7 @@ void loop() {
       vout = vout - vals[j];
     }
     Serial.println();
-    vals[i]=vout;
+    setNewValue(i, vout);
     
     dtostrf(vout, 2, 2, strs[i]);
   }
@@ -74,7 +77,7 @@ void loop() {
     for(int j=5; j<i; j++){
       vout = vout - vals[j];
     }
-    vals[i]=vout;
+    setNewValue(i, vout);
     
     dtostrf(vout, 2, 2, strs[i]);
   }
@@ -83,6 +86,7 @@ void loop() {
   Serial.println();
 
   for(int i=0;i<10;i++){
+    if(!refresh[i]) continue;
     int col = i/5;
     
     if(vals[i]<=3.85){
@@ -97,11 +101,19 @@ void loop() {
     TFTscreen.fill(0,0,0);
     TFTscreen.rect(col*80, 25*(i-5*col), 80, 25);
     TFTscreen.text(strs[i], 6+col*80, 25*(i-5*col)+5);
-    delay(50);
   }
   
   delay(500);
   
+}
+
+void setNewValue(int i, float val){
+  if(fabs(vals[i]-val)>=EPSILON){
+      vals[i]=val;
+      refresh[i]=true;
+    }else{
+      refresh[i]=false;
+    }
 }
 
 void printArr(float* arr, int size){
