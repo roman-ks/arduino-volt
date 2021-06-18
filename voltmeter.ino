@@ -62,8 +62,7 @@ void loop() {
     // sum will be in the last cell, save into separate array
     if (i % ROWS == ROWS - 1) {
       int offset = i / ROWS;
-      setNewValue(vout, sumVals + offset, sumRefresh + offset,
-                  sumStrs[offset]);
+      setNewValue(vout, sumVals + offset, sumRefresh + offset, sumStrs[offset]);
     }
 
     int colStart = i / ROWS * ROWS;
@@ -113,8 +112,7 @@ void loop() {
   delay(500);
 }
 
-void setNewValue(float val, float* valPtr, bool* refreshPtr,
-                 char* strVal) {
+void setNewValue(float val, float* valPtr, bool* refreshPtr, char* strVal) {
   bool isNew = fabs(*valPtr - val) >= EPSILON;
   if (isNew) {
     *valPtr = val;
