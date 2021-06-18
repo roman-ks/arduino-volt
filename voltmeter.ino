@@ -3,7 +3,7 @@
 #include <TFT.h>
 #include <stdlib.h>
 
-// pin definition for Arduino UNO
+// pin definition for Arduino MEGA
 #define cs 53
 #define dc 22
 #define rst 8
@@ -62,7 +62,7 @@ void loop() {
     // sum will be in the last cell, save into separate array
     if (i % ROWS == ROWS - 1) {
       int offset = i / ROWS;
-      setNewValue(offset, vout, sumVals + offset, sumRefresh + offset,
+      setNewValue(vout, sumVals + offset, sumRefresh + offset,
                   sumStrs[offset]);
     }
 
@@ -73,7 +73,7 @@ void loop() {
       vout = vout - vals[j];
     }
     Serial.println();
-    setNewValue(i, vout, vals + i, refresh + i, strs[i]);
+    setNewValue(vout, vals + i, refresh + i, strs[i]);
   }
 
   Serial.print("First half: ");
@@ -113,7 +113,7 @@ void loop() {
   delay(500);
 }
 
-void setNewValue(int i, float val, float* valPtr, bool* refreshPtr,
+void setNewValue(float val, float* valPtr, bool* refreshPtr,
                  char* strVal) {
   bool isNew = fabs(*valPtr - val) >= EPSILON;
   if (isNew) {
